@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BRIDGE_CONFIG } from "../../config/bridge.config";
 
-export const metadata = { title: "Ejemplo de sitio web · AsterTap MX" };
+export const metadata = { title: "Ejemplo de sitio web · AsterTap" };
 
 export default function SitioDemoPage() {
   const { demoSite = {}, theme = {} } = BRIDGE_CONFIG;
@@ -44,6 +44,17 @@ export default function SitioDemoPage() {
       >
         Quiero un sitio como este
       </a>
+
+      {demoSite.realExample?.url && (
+        <a
+          className="btn ghost cta"
+          href={demoSite.realExample.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {demoSite.realExample.label}
+        </a>
+      )}
     </div>
   );
 }

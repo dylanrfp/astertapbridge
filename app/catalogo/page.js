@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BRIDGE_CONFIG } from "../../config/bridge.config";
 
-export const metadata = { title: "Catálogo · AsterTap MX" };
+export const metadata = { title: "Catálogo · AsterTap" };
 
 export default function CatalogoPage() {
   const { catalog = [], theme = {} } = BRIDGE_CONFIG;

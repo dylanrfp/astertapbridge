@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { Icon, DefaultMark } from "./icons";
+import { WifiSheet, useToast } from "./ui";
 
 export default function Bridge({ config }) {
   const {
@@ -15,9 +16,15 @@ export default function Bridge({ config }) {
     showAsterTapBranding,
     asterTapTagline,
     asterTapUrl,
-    footerBrandLabel = "AsterTap MX",
+    footerBrandLabel = "AsterTap",
+    wifi,
     theme = {},
   } = config;
+
+  // Links sin url (pendientes) no se muestran, para no tener botones rotos.
+  const visibleLinks = links.filter((l) => l.url);
+  const [wifiOpen, setWifiOpen] = useState(false);
+  const [toastNode, showToast] = useToast();
 
   const [lightMode, setLightMode] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
@@ -45,19 +52,21 @@ export default function Bridge({ config }) {
       return;
     }
 
-    // Get click position or center of logo
-    const rect = markRef.current?.getBoundingClientRect() || e.currentTarget.getBoundingClientRect();
-    const x = e.clientX && e.clientX > 0 ? e.clientX : rect.left + rect.width / 2;
-    const y = e.clientY && e.clientY > 0 ? e.clientY : rect.top + rect.height / 2;
+    // Calcular el centro exacto del logo (siempre desde el centro, nunca desde la esquina o el cursor)
+    const rect = markRef.current?.getBoundingClientRect();
+    const x = rect ? Math.round(rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
+    const y = rect ? Math.round(rect.top + rect.height / 2) : 130;
 
-    const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
+    const endRadius = Math.ceil(
+      Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      )
     );
 
-    document.documentElement.style.setProperty("--ripple-x", `${Math.round(x)}px`);
-    document.documentElement.style.setProperty("--ripple-y", `${Math.round(y)}px`);
-    document.documentElement.style.setProperty("--ripple-r", `${Math.ceil(endRadius)}px`);
+    document.documentElement.style.setProperty("--ripple-x", `${x}px`);
+    document.documentElement.style.setProperty("--ripple-y", `${y}px`);
+    document.documentElement.style.setProperty("--ripple-r", `${endRadius}px`);
     document.documentElement.classList.add("in-view-transition");
 
     const transition = document.startViewTransition(() => {
@@ -119,7 +128,7 @@ export default function Bridge({ config }) {
       {description && <p className="desc">{description}</p>}
 
       <div className="links">
-        {links.map((link) => {
+        {visibleLinks.map((link) => {
           const className = `btn${link.highlight ? " highlight" : ""}`;
           const content = (
             <>
@@ -135,13 +144,27 @@ export default function Bridge({ config }) {
             </>
           );
 
+          // WiFi: abre la ventanita con red + "Copiar contraseña".
+          if (link.action === "wifi") {
+            return (
+              <button
+                key={link.label}
+                type="button"
+                className={className}
+                onClick={() => setWifiOpen(true)}
+              >
+                {content}
+              </button>
+            );
+          }
+
           // Links internos (páginas propias del sitio, ej. /catalogo) usan
           // next/link para navegación instantánea sin recargar; los externos
           // (WhatsApp, redes, reseñas) son <a> normales que abren en pestaña
           // nueva.
           if (link.internal) {
             return (
-              <Link key={link.url} href={link.url} className={className}>
+              <Link key={link.label} href={link.url} className={className}>
                 {content}
               </Link>
             );
@@ -149,7 +172,7 @@ export default function Bridge({ config }) {
 
           return (
             <a
-              key={link.url}
+              key={link.label}
               className={className}
               href={link.url}
               target="_blank"
@@ -174,6 +197,14 @@ export default function Bridge({ config }) {
           </a>
         </footer>
       )}
+
+      <WifiSheet
+        open={wifiOpen}
+        onClose={() => setWifiOpen(false)}
+        wifi={wifi}
+        onCopied={showToast}
+      />
+      {toastNode}
     </div>
   );
 }

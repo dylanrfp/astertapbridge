@@ -1,6 +1,7 @@
-import Bridge from "../components/Bridge";
+import BridgeDinamico from "../components/BridgeDinamico";
 import { BRIDGE_CONFIG } from "../config/bridge.config";
 
+// La propuesta dinámica es ahora la página principal oficial
 export default function Page() {
-  return <Bridge config={BRIDGE_CONFIG} />;
+  return <BridgeDinamico config={BRIDGE_CONFIG} />;
 }
