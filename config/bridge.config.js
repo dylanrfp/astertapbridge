@@ -21,8 +21,8 @@ export const BRIDGE_CONFIG = {
   // --- Dominio ---
   // URL pública con la que se comparte el Bridge (previews de WhatsApp,
   // Google, botón "Compartir"). astertap.com redirige a www en Vercel.
-  siteUrl: "https://www.astertap.com",
-  displayDomain: "astertap.com",
+  siteUrl: "https://bridge.astertap.com",
+  displayDomain: "bridge.astertap.com",
 
   // --- Diseño ---
   // "clasico"  → el Bridge de siempre (lista de botones).
