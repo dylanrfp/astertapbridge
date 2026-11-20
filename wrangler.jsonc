@@ -1,9 +1,16 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "astertapbridge",
   "compatibility_date": "2026-11-18",
   "assets": {
     "directory": "./out",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "bridge.astertap.com",
+      "custom_domain": true
+    }
+  ]
 }
