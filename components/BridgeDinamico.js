@@ -98,6 +98,8 @@ function G({ name, size = 20 }) {
       return <svg {...p}><path d="M7 17L17 7" /><path d="M8 7h9v9" /></svg>;
     case "chev":
       return <svg {...p}><path d="M9 6l6 6-6 6" /></svg>;
+    case "chevLeft":
+      return <svg {...p}><path d="M15 18l-6-6 6-6" /></svg>;
     case "plus":
       return <svg {...p}><path d="M12 5v14M5 12h14" /></svg>;
     case "app":
@@ -183,12 +185,14 @@ export default function BridgeDinamico({ config }) {
 
   const rootRef = useRef(null);
   const orbRef = useRef(null);
+  const showTrackRef = useRef(null);
   const wordRefs = useRef([]);
   const [rotW, setRotW] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [word, setWord] = useState(0);
   const [tab, setTab] = useState(0);
   const [openSvc, setOpenSvc] = useState(0);
+  const [showIdx, setShowIdx] = useState(0);
   const [lightMode, setLightMode] = useState(false);
   const [orbBump, setOrbBump] = useState(false);
   const [wifiOpen, setWifiOpen] = useState(false);
@@ -384,6 +388,36 @@ export default function BridgeDinamico({ config }) {
     }
     setInstallOpen(true);
   };
+
+  /* --- navegación del carrusel de trabajos reales --- */
+  const onShowScroll = useCallback((e) => {
+    const el = e.currentTarget;
+    if (!el || !showcase.length) return;
+    const card = el.firstElementChild;
+    const cardWidth = card ? card.offsetWidth + 12 : el.clientWidth * 0.75;
+    const idx = Math.round(el.scrollLeft / cardWidth);
+    setShowIdx(Math.max(0, Math.min(showcase.length - 1, idx)));
+  }, [showcase.length]);
+
+  const scrollShow = useCallback((dir) => {
+    haptic(8);
+    const el = showTrackRef.current;
+    if (!el) return;
+    const card = el.firstElementChild;
+    const step = card ? card.offsetWidth + 12 : el.clientWidth * 0.75;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  }, []);
+
+  const scrollToShowIdx = useCallback((i) => {
+    haptic(8);
+    const el = showTrackRef.current;
+    if (!el) return;
+    const cards = el.children;
+    if (cards[i]) {
+      cards[i].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+      setShowIdx(i);
+    }
+  }, []);
 
   /* --- swipe entre pestañas --- */
   const touch = useRef(null);
@@ -737,10 +771,36 @@ export default function BridgeDinamico({ config }) {
         {showcase.length > 0 && (
           <section className={s.show} data-reveal>
             <div className={s.secHead}>
-              <h2>Trabajos reales</h2>
-              <span className={s.hint}>{showcase.length} proyectos</span>
+              <div>
+                <h2>Trabajos reales</h2>
+                <span className={s.hint}>{showcase.length} proyectos · desliza</span>
+              </div>
+              <div className={s.showNav}>
+                <button
+                  type="button"
+                  className={s.showNavBtn}
+                  onClick={() => scrollShow(-1)}
+                  aria-label="Proyecto anterior"
+                  disabled={showIdx === 0}
+                >
+                  <G name="chevLeft" size={13} />
+                </button>
+                <button
+                  type="button"
+                  className={s.showNavBtn}
+                  onClick={() => scrollShow(1)}
+                  aria-label="Siguiente proyecto"
+                  disabled={showIdx >= showcase.length - 1}
+                >
+                  <G name="chev" size={13} />
+                </button>
+              </div>
             </div>
-            <div className={s.showTrack}>
+            <div
+              ref={showTrackRef}
+              className={s.showTrack}
+              onScroll={onShowScroll}
+            >
               {showcase.map((w, i) => {
                 const initials = w.mark || w.name
                   .split(/\s+/)
@@ -763,7 +823,7 @@ export default function BridgeDinamico({ config }) {
                     <span className={s.showArt} aria-hidden="true">
                       {w.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={w.image} alt={w.name} className={s.showImg} loading="lazy" />
+                        <img src={w.image} alt={w.name} className={s.showImg} />
                       ) : (
                         <span className={s.showInit}>{initials}</span>
                       )}
@@ -776,6 +836,17 @@ export default function BridgeDinamico({ config }) {
                   </a>
                 );
               })}
+            </div>
+            <div className={s.showDots} aria-label="Indicador de proyectos">
+              {showcase.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`${s.showDot} ${i === showIdx ? s.showDotOn : ""}`}
+                  onClick={() => scrollToShowIdx(i)}
+                  aria-label={`Ver proyecto ${i + 1} de ${showcase.length}`}
+                />
+              ))}
             </div>
           </section>
         )}

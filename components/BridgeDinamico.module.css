@@ -1021,10 +1021,46 @@
 .show {
   margin-top: 30px;
 }
+.showNav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.showNavBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--card-line);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.showNavBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+.showNavBtn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.showNavBtn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+:global(html.light) .showNavBtn {
+  background: #ffffff;
+  border-color: rgba(18, 18, 18, 0.14);
+  color: #121212;
+}
 .showTrack {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 74%;
+  grid-auto-columns: 78%;
   gap: 12px;
   margin: 0 -18px;
   padding: 2px 18px 10px;
@@ -1033,8 +1069,43 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
+@media (min-width: 480px) {
+  .showTrack {
+    grid-auto-columns: calc(50% - 6px);
+  }
+}
 .showTrack::-webkit-scrollbar {
   display: none;
+}
+.showDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.showDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.22s ease;
+}
+.showDot:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+.showDotOn {
+  width: 18px;
+  background: var(--accent);
+}
+:global(html.light) .showDot {
+  background: rgba(18, 18, 18, 0.2);
+}
+:global(html.light) .showDotOn {
+  background: var(--accent);
 }
 .showCard {
   position: relative;
@@ -1060,7 +1131,7 @@
 }
 .showArt {
   position: relative;
-  height: 118px;
+  height: 142px;
   margin-bottom: 10px;
   border-radius: 14px;
   overflow: hidden;
