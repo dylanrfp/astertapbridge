@@ -820,10 +820,15 @@ export default function BridgeDinamico({ config }) {
                     style={{ "--k": i }}
                     onPointerDown={pressGlow}
                   >
-                    <span className={s.showArt} aria-hidden="true">
+                    <span className={`${s.showArt} ${!w.image ? s.showArtFallback : ""}`} aria-hidden="true">
                       {w.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={w.image} alt={w.name} className={s.showImg} />
+                        <img
+                          src={w.image}
+                          alt={w.name}
+                          className={s.showImg}
+                          style={w.imagePos ? { objectPosition: w.imagePos } : undefined}
+                        />
                       ) : (
                         <span className={s.showInit}>{initials}</span>
                       )}
